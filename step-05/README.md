@@ -37,6 +37,16 @@
 2. 関数適用時、クロージャが保持する環境を継承
 3. 新しい束縛を追加した後、関数本体を評価
 
+## 実行方法
+
+```bash
+# Gaucheの場合
+gosh step-05/closures.scm
+
+# Chez Schemeの場合
+chezscheme step-05/closures.scm
+```
+
 ## 次のステップ
 
 次のステップでは、条件分岐とブール値を実装します。

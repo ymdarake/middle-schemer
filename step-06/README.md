@@ -33,6 +33,16 @@
 2. 比較演算: 数値同士を比較する関数を実装
 3. 論理演算: 短絡評価（short-circuit evaluation）を実装
 
+## 実行方法
+
+```bash
+# Gaucheの場合
+gosh step-06/conditionals.scm
+
+# Chez Schemeの場合
+chezscheme step-06/conditionals.scm
+```
+
 ## 次のステップ
 
 次のステップでは、再帰とループ構文を実装します。

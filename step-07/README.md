@@ -37,6 +37,16 @@
 2. `let` は新しい環境を作成して式を評価
 3. `letrec` は相互再帰を可能にするため、環境を拡張してから値を評価
 
+## 実行方法
+
+```bash
+# Gaucheの場合
+gosh step-07/recursion.scm
+
+# Chez Schemeの場合
+chezscheme step-07/recursion.scm
+```
+
 ## 次のステップ
 
 次のステップでは、マクロとメタプログラミングを実装します（オプション）。
