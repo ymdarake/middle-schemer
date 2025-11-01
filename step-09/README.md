@@ -64,6 +64,17 @@ chezscheme step-09/interpreter.scm
 - 局所変数（let, letrec）
 - 再帰関数
 - マクロ（quote, quasiquote, unquote）
+- 高度なマクロ（define-syntax, syntax-rules）
+
+### マクロの使用例
+
+```scheme
+;; マクロを定義
+(interpret "(define-syntax unless (syntax-rules () ((_ condition body) (if (not condition) body))))")
+
+;; マクロを使用
+(interpret "(unless #f (display \"Hello\"))")  ; => "Hello"を表示
+```
 
 ## 次のステップ
 

@@ -1,5 +1,5 @@
 ;; ステップ8: マクロとメタプログラミング
-;; quote, quasiquote, unquote と基本的なマクロ展開器を実装する
+;; quote, quasiquote, unquote と define-syntax, syntax-rules を実装する
 
 ;; ============================================
 ;; 基本的な評価器（step-04をベースに拡張）
@@ -39,13 +39,23 @@
            ((eq? operator 'define)
             (eval-define operands env))
            
+           ;; define-syntax: マクロを定義
+           ((eq? operator 'define-syntax)
+            (eval-define-syntax operands env))
+           
            ;; lambda: 関数を定義
            ((eq? operator 'lambda)
             (eval-lambda operands env))
            
            ;; 関数適用（その他）
            (else
-            (eval-application operator operands env))))))
+            ;; マクロ展開を試みる
+            (let ((maybe-expanded (expand-macro expr env)))
+              (if (eq? maybe-expanded expr)
+                  ;; マクロでない場合は通常の関数適用
+                  (eval-application operator operands env)
+                  ;; マクロ展開された場合は再帰的に評価
+                  (eval-expr maybe-expanded env))))))))
    
    (else
     (error "Cannot evaluate:" expr))))
@@ -76,6 +86,27 @@
     (let ((value (eval-expr value-expr env)))
       (extend-env name value env)
       value)))
+
+(define (eval-define-syntax args env)
+  "define-syntax を評価する：マクロを定義"
+  (if (< (length args) 2)
+      (error "define-syntax requires at least 2 arguments"))
+  
+  (let ((name (car args))
+        (transformer (cadr args)))
+    (if (not (symbol? name))
+        (error "define-syntax: first argument must be a symbol"))
+    
+    ;; マクロはsyntax-rulesで定義される
+    (if (not (list? transformer))
+        (error "define-syntax: second argument must be a syntax-rules form"))
+    
+    (if (not (eq? (car transformer) 'syntax-rules))
+        (error "define-syntax: currently only syntax-rules is supported"))
+    
+    ;; マクロトランスフォーマーをマクロ環境に追加
+    (set! *macro-env* (cons (cons name (cons 'macro transformer)) *macro-env*))
+    #t)))  ; define-syntax自体は値を返さない
 
 (define (eval-lambda args env)
   "lambda を評価してクロージャを作成"
@@ -176,6 +207,130 @@
     expr)))
 
 ;; ============================================
+;; define-syntax と syntax-rules の実装
+;; ============================================
+
+;; マクロ環境（グローバル環境とは別に管理）
+(define *macro-env* '())
+
+(define (expand-macro expr env)
+  "マクロ展開を試みる。マクロでない場合はそのまま返す"
+  (if (not (list? expr))
+      expr
+      (if (null? expr)
+          '()
+          (let ((operator (car expr)))
+            (if (symbol? operator)
+                (let ((macro-binding (assoc operator *macro-env*)))
+                  (if (and macro-binding
+                           (pair? (cdr macro-binding))
+                           (eq? (cadr macro-binding) 'macro))
+                      ;; マクロが見つかった
+                      (let ((transformer (cddr macro-binding)))
+                        (apply-syntax-rules transformer
+                                           (cdr expr)
+                                           env))
+                      ;; マクロでない
+                      expr))
+                expr)))))
+
+(define (apply-syntax-rules transformer args env)
+  "syntax-rules を使ってマクロ展開を実行（簡易版）"
+  ;; transformer の形式: (syntax-rules (literal ...) ((pattern template) ...))
+  ;; 注意: これは簡易実装です。実際のsyntax-rulesはもっと複雑です。
+  (if (< (length transformer) 2)
+      (error "syntax-rules: invalid form"))
+  
+  (let ((literals (if (null? (cadr transformer))
+                      '()
+                      (cadr transformer)))
+        (rules (cddr transformer)))
+    ;; 引数をパターンに合わせて展開（argsのcarを削除してpatternとマッチ）
+    ;; 実際の実装では、パターンの最初の要素が_の場合は無視する
+    (let ((pattern-args (if (and (not (null? args))
+                                  (symbol? (car args)))
+                            (cdr args)
+                            args)))
+      ;; 最初にマッチするルールを見つける
+      (let loop ((rest-rules rules))
+        (if (null? rest-rules)
+            (error "syntax-rules: no matching pattern")
+            (let ((rule (car rest-rules)))
+              (if (not (and (list? rule)
+                            (= (length rule) 2)))
+                  (error "syntax-rules: invalid rule format")
+                  (let ((pattern (car rule))
+                        (template (cadr rule)))
+                    ;; パターンマッチング（簡易版）
+                    ;; パターンの最初の要素（通常は_）をスキップ
+                    (let ((pattern-to-match (if (and (list? pattern)
+                                                      (not (null? pattern)))
+                                                (cdr pattern)
+                                                pattern)))
+                      (let ((match-result (match-pattern pattern-to-match pattern-args literals)))
+                        (if match-result
+                            ;; マッチした場合はテンプレートを展開
+                            (expand-template template match-result)
+                            ;; マッチしなかった場合は次のルールを試す
+                            (loop (cdr rest-rules)))))))))))))
+
+(define (match-pattern pattern input literals)
+  "パターンマッチング（簡易版）。マッチした場合は束縛のリストを返す"
+  ;; 注意: これは非常に簡易版です。実際のsyntax-rulesはもっと複雑です。
+  (cond
+   ((symbol? pattern)
+    ;; リテラルでないシンボルは変数として扱う
+    (if (member pattern literals)
+        ;; リテラルの場合は完全一致が必要
+        (if (and (symbol? input) (eq? pattern input))
+            '()
+            #f)
+        ;; 変数の場合は任意の値とマッチ
+        (list (cons pattern input))))
+   ((list? pattern)
+    ;; リストの場合は再帰的にマッチ
+    (if (not (list? input))
+        #f
+        (let ((pattern-len (length pattern))
+              (input-len (length input)))
+          (if (= pattern-len input-len)
+              (let loop ((p-rest pattern)
+                         (i-rest input)
+                         (bindings '()))
+                (if (null? p-rest)
+                    bindings
+                    (let ((p-item (car p-rest))
+                          (i-item (car i-rest)))
+                      (let ((match (match-pattern p-item i-item literals)))
+                        (if match
+                            (loop (cdr p-rest)
+                                  (cdr i-rest)
+                                  (append match bindings))
+                            #f)))))
+              #f))))
+   (else
+    ;; それ以外は完全一致が必要
+    (if (equal? pattern input)
+        '()
+        #f))))
+
+(define (expand-template template bindings)
+  "テンプレートを展開する"
+  (cond
+   ((symbol? template)
+    ;; シンボルの場合は束縛を探す
+    (let ((binding (assoc template bindings)))
+      (if binding
+          (cdr binding)
+          template)))
+   ((list? template)
+    ;; リストの場合は再帰的に展開
+    (map (lambda (t) (expand-template t bindings)) template))
+   (else
+    ;; それ以外はそのまま
+    template)))
+
+;; ============================================
 ;; 組み込み演算関数
 ;; ============================================
 
@@ -226,6 +381,9 @@
 
 (define (test-macros)
   (display "=== マクロとメタプログラミングのテスト ===\n\n")
+  
+  ;; マクロ環境を初期化
+  (set! *macro-env* '())
   
   (let ((env '()))
     ;; 組み込み演算を環境に追加
@@ -309,7 +467,18 @@
   (display "  その部分だけが評価されます。\n")
   (display "\n")
   (display "これはマクロ展開の基礎です。\n")
-  (display "実際のマクロシステムでは、マクロ展開時にコードを変換します。\n"))
+  (display "実際のマクロシステムでは、マクロ展開時にコードを変換します。\n")
+  (display "\n")
+  (display "=== define-syntax と syntax-rules ===\n")
+  (display "define-syntax と syntax-rules を使うと、より高度なマクロを定義できます。\n")
+  (display "例:\n")
+  (display "  (define-syntax unless\n")
+  (display "    (syntax-rules ()\n")
+  (display "      ((_ condition body)\n")
+  (display "       (if (not condition) body))))\n")
+  (display "\n")
+  (display "注意: この実装は簡易版で、完全なsyntax-rulesの実装ではありません。\n")
+  (display "実際のSchemeでは、より高度なパターンマッチングが可能です。\n"))
 
 ;; 実行
 (test-macros)

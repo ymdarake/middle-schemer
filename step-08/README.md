@@ -25,6 +25,14 @@
 
 ;; unquote: quasiquote内で値に展開
 (quasiquote ((unquote (* 2 3)) (unquote (+ 1 2))))  ; => (6 3)
+
+;; define-syntax: マクロを定義
+(define-syntax unless
+  (syntax-rules ()
+    ((_ condition body)
+     (if (not condition) body))))
+
+(unless #f (display "Hello"))  ; => "Hello"を表示
 ```
 
 ## 実装のポイント
@@ -48,8 +56,12 @@ chezscheme step-08/macros.scm
 
 このステップは上級者向けです。基本的なインタープリターの実装が理解できていることが前提です。
 
-この実装では基本的な `quote`, `quasiquote`, `unquote` のみを実装しています。
-実際のSchemeでは、より高度なマクロシステム（`syntax-rules`, `syntax-case` など）が提供されます。
+この実装では以下の機能を実装しています：
+- `quote`, `quasiquote`, `unquote`: 基本的なマクロ機能
+- `define-syntax`, `syntax-rules`: より高度なマクロ定義機能（簡易版）
+
+注意: `define-syntax` と `syntax-rules` の実装は簡易版です。
+実際のSchemeでは、より高度なパターンマッチングや衛生マクロ（hygienic macros）が提供されます。
 
 ## 次のステップ
 
