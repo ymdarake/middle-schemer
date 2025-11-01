@@ -1,0 +1,19 @@
+# バイナリや実行ファイル
+*.o
+*.so
+*.dylib
+*.exe
+
+# ログファイル
+*.log
+
+# 一時ファイル
+*~
+.DS_Store
+
+# IDE設定（必要に応じて）
+.idea/
+.vscode/
+*.swp
+*.swo
+
