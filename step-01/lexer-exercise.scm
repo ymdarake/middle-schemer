@@ -19,11 +19,7 @@
   ;; TODO: ここを実装してください
   ;; ヒント: loop を使って i を進めていきます
   ;; 空白文字なら i+1、そうでなければ i を返します
-  (let loop ((i start))
-    (if (and (< i (string-length str))
-             (whitespace? (string-ref str i)))
-        (loop (+ i 1))
-        i)))
+  (error "skip-whitespace はまだ実装されていません"))
 
 (define (read-number str start)
   "数値トークンを読み取る。数値の終端位置と値のペアを返す"
@@ -90,10 +86,13 @@
 (define-test-suite test-skip-whitespace
   "skip-whitespace関数のテスト"
   (test-case "空白文字をスキップ"
-    (check-equal? (skip-whitespace "  abc" 0) 2)
-    (check-equal? (skip-whitespace "abc" 0) 0)
-    (check-equal? (skip-whitespace "   " 0) 3)
-    (check-equal? (skip-whitespace "  abc  def" 5) 7)))
+    ;; TODO: 実装してからテストが通るようにしてください
+    (with-handlers ([exn:fail? (lambda (e) 
+                                  (fail-check "skip-whitespace はまだ実装されていません"))])
+      (check-equal? (skip-whitespace "  abc" 0) 2)
+      (check-equal? (skip-whitespace "abc" 0) 0)
+      (check-equal? (skip-whitespace "   " 0) 3)
+      (check-equal? (skip-whitespace "  abc  def" 5) 7))))
 
 ;; テスト3: read-number 関数
 (define-test-suite test-read-number
