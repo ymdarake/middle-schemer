@@ -17,3 +17,6 @@
 *.swp
 *.swo
 
+# テスト結果ファイル
+.test-results/
+
