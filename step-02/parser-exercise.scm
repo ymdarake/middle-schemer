@@ -32,7 +32,7 @@
             (error "閉じ括弧の処理はまだ実装されていません"))
            ;; TODO: アトムの場合の処理を実装してください
            (else
-            (error "アトムの処理はまだ実装されていません")))))))
+            (error "アトムの処理はまだ実装されていません"))))))
   
   (define (parse-list tokens start-pos)
     "リストを解析する。構文木と次の位置のペアを返す"
@@ -110,7 +110,7 @@
                          (end-pos (car id-result))
                          (id-value (cadr id-result)))
                     (tokenize-helper str end-pos
-                                    (cons id-value tokens)))))))))
+                                    (cons id-value tokens))))))))))
   (tokenize-helper str 0 '()))
 
 ;; ============================================
