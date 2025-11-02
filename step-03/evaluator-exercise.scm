@@ -74,10 +74,61 @@
 
 (define empty-env '())
 
+;; テスト結果を蓄積するためのグローバル変数
+(define test-results '())
+
+;; ANSIカラーコード
+(define ansi-reset "\x1b[0m")
+(define ansi-green "\x1b[32m")
+(define ansi-red "\x1b[31m")
+
+;; テーブル風の表示用ヘルパー関数（色付け対応）
+(define (format-test-table results)
+  (let ((max-name-length 50))
+    ;; ヘッダーを表示
+    (display (format "+~a+----------+\n" (make-string max-name-length #\-)))
+    (display (format "| ~a~a | 結果     |\n" 
+                     "テスト名" 
+                     (make-string (- max-name-length 6) #\space)))
+    (display (format "+~a+----------+\n" (make-string max-name-length #\-)))
+    ;; 各テスト結果を表示
+    (for-each
+     (lambda (result)
+       (let* ((test-name (car result))
+              (status (cdr result))
+              (name-len (string-length test-name))
+              (padding (make-string (max 0 (- max-name-length name-len 3)) #\space))
+              ;; ステータスに応じて色を設定
+              (color-code (if (string=? status "SUCCESS") ansi-green ansi-red)))
+         (display (format "| ~a~a~a~a | ~a~a~a |\n" 
+                         color-code
+                         test-name 
+                         ansi-reset
+                         padding 
+                         color-code 
+                         status 
+                         ansi-reset))))
+     (reverse results))
+    ;; フッターを表示
+    (display (format "+~a+----------+\n" (make-string max-name-length #\-)))))
+
+;; 成功したテストケースも表示するカスタムtest-caseマクロ（テーブル風表示）
+(define-syntax-rule (test-case-verbose name body ...)
+  (test-case name
+    (with-handlers ([exn:fail? 
+                     (lambda (e)
+                       ;; 失敗時に結果を記録
+                       (set! test-results (cons (cons name "FAILURE") test-results))
+                       (raise e))])
+      (begin
+        body ...
+        ;; 成功時に結果を記録
+        (set! test-results (cons (cons name "SUCCESS") test-results))))))
+
 ;; テスト1: eval-expr 関数（数値）
 (define-test-suite test-eval-expr-number
   "eval-expr関数のテスト（数値）"
-  (test-case "数値をそのまま返す"
+  (test-case-verbose "数値をそのまま返す"
     (check-equal? (eval-expr 42 empty-env) 42)
     (check-equal? (eval-expr 0 empty-env) 0)
     (check-equal? (eval-expr -10 empty-env) -10)))
@@ -85,7 +136,7 @@
 ;; テスト2: eval-expr 関数（シンボル）
 (define-test-suite test-eval-expr-symbol
   "eval-expr関数のテスト（シンボル）"
-  (test-case "環境から値を取得"
+  (test-case-verbose "環境から値を取得"
     ;; TODO: 実装してからテストが通るようにしてください
     (with-handlers ([exn:fail? (lambda (e) 
                                   (fail-check "シンボルの処理はまだ実装されていません"))])
@@ -96,7 +147,7 @@
 ;; テスト3: eval-expr 関数（演算）
 (define-test-suite test-eval-expr-operations
   "eval-expr関数のテスト（演算）"
-  (test-case "基本的な演算"
+  (test-case-verbose "基本的な演算"
     ;; TODO: 実装してからテストが通るようにしてください
     (with-handlers ([exn:fail? (lambda (e) 
                                   (fail-check "演算の処理はまだ実装されていません"))])
@@ -108,7 +159,7 @@
 ;; テスト4: apply-+ 関数
 (define-test-suite test-apply-+
   "apply-+関数のテスト"
-  (test-case "加算を実行"
+  (test-case-verbose "加算を実行"
     ;; TODO: 実装してからテストが通るようにしてください
     (with-handlers ([exn:fail? (lambda (e) 
                                   (fail-check "apply-+ はまだ実装されていません"))])
@@ -119,7 +170,7 @@
 ;; テスト5: apply-- 関数
 (define-test-suite test-apply--
   "apply--関数のテスト"
-  (test-case "減算を実行"
+  (test-case-verbose "減算を実行"
     ;; TODO: 実装してからテストが通るようにしてください
     (with-handlers ([exn:fail? (lambda (e) 
                                   (fail-check "apply-- はまだ実装されていません"))])
@@ -130,7 +181,7 @@
 ;; テスト6: apply-* 関数
 (define-test-suite test-apply-*
   "apply-*関数のテスト"
-  (test-case "乗算を実行"
+  (test-case-verbose "乗算を実行"
     ;; TODO: 実装してからテストが通るようにしてください
     (with-handlers ([exn:fail? (lambda (e) 
                                   (fail-check "apply-* はまだ実装されていません"))])
@@ -141,7 +192,7 @@
 ;; テスト7: apply-/ 関数
 (define-test-suite test-apply-/
   "apply-/関数のテスト"
-  (test-case "除算を実行"
+  (test-case-verbose "除算を実行"
     ;; TODO: 実装してからテストが通るようにしてください
     (with-handlers ([exn:fail? (lambda (e) 
                                   (fail-check "apply-/ はまだ実装されていません"))])
@@ -161,6 +212,18 @@
    test-apply-*
    test-apply-/))
 
+;; 成功したテストケースも表示するカスタムrun-tests（テーブル風表示）
+(define (run-tests-with-success-display suite)
+  ;; テスト結果をリセット
+  (set! test-results '())
+  ;; 標準のrun-testsを実行（各テストケースがtest-resultsに結果を記録）
+  (run-tests suite)
+  ;; すべてのテストが終了した後にテーブルを表示
+  (display "\n")
+  (display "=== テスト結果サマリー ===\n")
+  (format-test-table test-results)
+  (display "\n"))
+
 ;; テストを実行（コマンドライン引数で個別のテストを指定可能）
 (define (run-selected-tests)
   (let ((args (vector->list (current-command-line-arguments))))
@@ -168,35 +231,35 @@
         ;; 引数がない場合はすべてのテストを実行
         (begin
           (display "=== 評価器のユニットテスト（すべて） ===\n\n")
-          (run-tests all-tests))
+          (run-tests-with-success-display all-tests))
         ;; 引数がある場合は個別のテストを実行
         (for-each
          (lambda (test-name)
            (case (string->symbol test-name)
              ((eval-expr-number number)
               (display "=== eval-expr 関数のテスト（数値） ===\n\n")
-              (run-tests test-eval-expr-number))
+              (run-tests-with-success-display test-eval-expr-number))
              ((eval-expr-symbol symbol)
               (display "=== eval-expr 関数のテスト（シンボル） ===\n\n")
-              (run-tests test-eval-expr-symbol))
+              (run-tests-with-success-display test-eval-expr-symbol))
              ((eval-expr-operations operations)
               (display "=== eval-expr 関数のテスト（演算） ===\n\n")
-              (run-tests test-eval-expr-operations))
+              (run-tests-with-success-display test-eval-expr-operations))
              ((apply-+ apply-plus plus)
               (display "=== apply-+ 関数のテスト ===\n\n")
-              (run-tests test-apply-+))
+              (run-tests-with-success-display test-apply-+))
              ((apply-- apply-minus minus)
               (display "=== apply-- 関数のテスト ===\n\n")
-              (run-tests test-apply--))
+              (run-tests-with-success-display test-apply--))
              ((apply-* apply-times times multiply)
               (display "=== apply-* 関数のテスト ===\n\n")
-              (run-tests test-apply-*))
+              (run-tests-with-success-display test-apply-*))
              ((apply-/ apply-div divide div)
               (display "=== apply-/ 関数のテスト ===\n\n")
-              (run-tests test-apply-/))
+              (run-tests-with-success-display test-apply-/))
              ((all)
               (display "=== 評価器のユニットテスト（すべて） ===\n\n")
-              (run-tests all-tests))
+              (run-tests-with-success-display all-tests))
              (else
               (display (format "未知のテスト: ~a\n" test-name))
               (display "利用可能なテスト: eval-expr-number, eval-expr-symbol, eval-expr-operations, apply-+, apply--, apply-*, apply-/, all\n"))))
