@@ -40,11 +40,8 @@
 ## 実行方法
 
 ```bash
-# Gaucheの場合
-gosh step-07/recursion.scm
-
-# Chez Schemeの場合
-chezscheme step-07/recursion.scm
+# Racketの場合
+racket step-07/recursion.scm
 ```
 
 ## 練習問題

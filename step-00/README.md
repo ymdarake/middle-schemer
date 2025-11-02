@@ -2,104 +2,71 @@
 
 ## 目的
 
-Schemeの開発環境を構築し、コードを実行できるようにします。
+Racketの開発環境を構築し、コードを実行できるようにします。
 
 ## このステップで行うこと
 
-1. Scheme処理系のインストール
+1. Racketのインストール
 2. 動作確認
 3. エディタの設定（推奨）
-4. 基本的なSchemeの復習
+4. 基本的なRacket/Schemeの復習
 
-## 推奨Scheme処理系
+## 推奨処理系
 
-このプロジェクトでは、**標準的なSchemeの学習**に集中するため、純粋なScheme処理系を推奨します。
+このプロジェクトでは、**Racket**を使用します。
 
-### 1. Gauche（最推奨・初心者向け）
+### Racket
 
 **特徴**:
-- 日本語ドキュメントが充実
-- 標準的なScheme（R7RS準拠）に準拠
-- シンプルで学習に適している
-- 開発が活発
-- 標準ライブラリが豊富
+- Schemeのスーパーセットで、標準的なSchemeの機能に加えて豊富なライブラリを提供
+- 教育向けの実装で、ドキュメントが充実
+- マクロシステムが強力（syntax-rules、syntax-case等）
+- 実用的で、言語処理系の実装に適している
+- DrRacketという統合開発環境が利用可能（対話的デバッグが便利）
+- パターンマッチングなどの便利な機能も利用可能
 
 **インストール方法**:
 
 macOS (Homebrew):
 ```bash
-brew install gauche
-```
-
-Linux (apt):
-```bash
-sudo apt-get install gauche
-```
-
-Windows:
-[公式サイト](https://practical-scheme.net/gauche/)からインストーラーをダウンロード
-
-**動作確認**:
-```bash
-gosh --version
-```
-
-### 2. Chez Scheme（上級者向け）
-
-**特徴**:
-- 非常に高速
-- 実用的な実装
-- 商用利用も可能
-
-**インストール方法**:
-
-macOS (Homebrew):
-```bash
-brew install chezscheme
+brew install racket
 ```
 
 Linux:
 ```bash
-# ソースからビルド、またはリポジトリから
-# 詳しくは https://github.com/cisco/ChezScheme
+# パッケージマネージャーからインストール、または
+# https://download.racket-lang.org/ からインストーラーをダウンロード
+```
+
+Windows:
+```bash
+# https://download.racket-lang.org/ からインストーラーをダウンロード
 ```
 
 **動作確認**:
 ```bash
-chezscheme --version
+racket --version
 ```
 
-### 3. その他の選択肢
+**Racketの実行方法**:
+```bash
+# ファイルを実行
+racket hello.scm
 
-**Chicken Scheme**:
-- 実用的な実装
-- 多くのライブラリが利用可能
+# 対話的REPLを起動
+racket
 
-**MIT Scheme**:
-- 教育機関でよく使用される
-- SICP（Structure and Interpretation of Computer Programs）で使用
-
-### なぜRacketを使わないのか？
-
-RacketはSchemeのスーパーセットで、独自の拡張機能が多く含まれています。
-このプロジェクトは**標準的なSchemeの理解**に焦点を当てているため、Racketは使用しません。
-
-- Racketは独自の構文やライブラリが多い
-- 標準的なSchemeとは異なる動作をする場合がある
-- このプロジェクトの目的（言語処理系の基礎理解）には、標準的なSchemeの方が適している
-
-**Racketの学習は別途コンテンツとして扱う予定です。**
+# DrRacket IDEを起動（GUI）
+drracket
+```
 
 ## 動作確認
 
 以下のコマンドで動作確認を行います：
 
 ```bash
-# Gaucheの場合（推奨）
-gosh step-00/hello.scm
-
-# Chez Schemeの場合
-chezscheme step-00/hello.scm
+# Racketの場合
+racket step-00/hello.scm
 ```
 
 正常に動作すれば、以下のような出力が表示されます：
@@ -114,26 +81,35 @@ Hello, Scheme!
 
 ## エディタの設定（推奨）
 
+### DrRacket（推奨）
+
+Racketに標準で含まれる統合開発環境です。初心者にも使いやすく、対話的デバッグが可能です。
+
+起動方法:
+```bash
+drracket
+```
+
 ### Visual Studio Code
 
 拡張機能:
-- **Scheme** または **Geiser** (Scheme言語サポート)
-- **Lisp** (Lisp系言語のサポート)
+- **Magic Racket** (Racket言語サポート)
+- **Geiser** (Scheme言語サポート、Racketでも使用可能)
 
 ### Emacs
 
-`geiser-mode` をインストール:
+`geiser-mode` をインストール（Racketに対応）:
 ```elisp
 (require 'geiser)
 ```
 
 ### Vim/Neovim
 
-`vim-scheme` などのプラグインを使用
+`vim-racket` などのプラグインを使用
 
-## 基本的なSchemeの復習
+## 基本的なRacket/Schemeの復習
 
-このプロジェクトで使用する基本的なSchemeの構文を確認します。
+このプロジェクトで使用する基本的なRacket/Schemeの構文を確認します。
 
 ### 基本的な構文
 
@@ -185,7 +161,7 @@ Hello, Scheme!
 
 ### 実行時にエラーが出る場合
 
-- Schemeのバージョンを確認（R6RSまたはR7RS互換が必要）
+- Racketのバージョンを確認
 - ファイルの文字エンコーディングがUTF-8になっているか確認
 
 ### macOSでの注意

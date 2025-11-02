@@ -42,11 +42,8 @@ middle-schemer/
 すべてのステップを完了したら、**step-09** の統合インタプリタを実行できます：
 
 ```bash
-# Gaucheの場合
-gosh step-09/interpreter.scm
-
-# Chez Schemeの場合
-chezscheme step-09/interpreter.scm
+# Racketの場合
+racket step-09/interpreter.scm
 ```
 
 文字列のプログラムコードを直接実行できます：
@@ -82,23 +79,35 @@ chezscheme step-09/interpreter.scm
 
 ## 実装言語
 
-- **Scheme** (R6RS互換またはR7RS)
+- **Racket** (Schemeのスーパーセット)
 
-### 推奨Scheme処理系
+### 推奨処理系
 
-このプロジェクトでは、**標準的なSchemeの学習**に集中するため、以下の処理系を推奨します：
+このプロジェクトでは、**Racket**を使用します。
 
-1. **Gauche**（最推奨・初心者向け）
-   - 日本語ドキュメントが充実
-   - 標準的なSchemeに準拠
-   - 学習に適した実装
+**Racketの特徴**:
+- Schemeのスーパーセットで、標準的なSchemeの機能に加えて豊富なライブラリを提供
+- 教育向けの実装で、ドキュメントが充実
+- マクロシステムが強力
+- 実用的で、言語処理系の実装に適している
+- DrRacketという統合開発環境が利用可能
 
-2. **Chez Scheme**（上級者向け）
-   - 非常に高速
-   - 実用的な実装
+**インストール方法**:
+```bash
+# macOS (Homebrew)
+brew install racket
 
-**注意**: RacketはSchemeのスーパーセットで独自拡張が多いため、このプロジェクトでは使用しません。
-Racketの学習は別途コンテンツとして扱う予定です。
+# Linux
+# https://download.racket-lang.org/ からインストーラーをダウンロード
+
+# Windows
+# https://download.racket-lang.org/ からインストーラーをダウンロード
+```
+
+**動作確認**:
+```bash
+racket --version
+```
 
 詳細は **step-00/README.md** を参照してください。
 

@@ -36,11 +36,8 @@
 ## 実行方法
 
 ```bash
-# Gaucheの場合
-gosh step-06/conditionals.scm
-
-# Chez Schemeの場合
-chezscheme step-06/conditionals.scm
+# Racketの場合
+racket step-06/conditionals.scm
 ```
 
 ## 練習問題

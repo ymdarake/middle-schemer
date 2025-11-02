@@ -45,11 +45,8 @@
 ## 実行方法
 
 ```bash
-# Gaucheの場合
-gosh step-08/macros.scm
-
-# Chez Schemeの場合
-chezscheme step-08/macros.scm
+# Racketの場合
+racket step-08/macros.scm
 ```
 
 ## 注意

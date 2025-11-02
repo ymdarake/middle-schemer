@@ -43,11 +43,8 @@
 ## 実行方法
 
 ```bash
-# Gaucheの場合
-gosh step-09/interpreter.scm
-
-# Chez Schemeの場合
-chezscheme step-09/interpreter.scm
+# Racketの場合
+racket step-09/interpreter.scm
 ```
 
 ## 完成版としての使い方

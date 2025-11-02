@@ -42,7 +42,7 @@
 実装が完了したら、実行してテストが通ることを確認してください。
 
 ```bash
-gosh step-01/lexer-exercise.scm
+racket step-01/lexer-exercise.scm
 ```
 
 ### 応用問題

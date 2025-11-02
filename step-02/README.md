@@ -43,7 +43,7 @@ S式のネストした構造を正しく解析します。
 実装が完了したら、実行してテストが通ることを確認してください。
 
 ```bash
-gosh step-02/parser-exercise.scm
+racket step-02/parser-exercise.scm
 ```
 
 ### 応用問題

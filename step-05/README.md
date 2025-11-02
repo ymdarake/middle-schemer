@@ -40,11 +40,8 @@
 ## 実行方法
 
 ```bash
-# Gaucheの場合
-gosh step-05/closures.scm
-
-# Chez Schemeの場合
-chezscheme step-05/closures.scm
+# Racketの場合
+racket step-05/closures.scm
 ```
 
 ## 練習問題

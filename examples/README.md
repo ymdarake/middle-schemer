@@ -7,11 +7,11 @@
 まず、step-09の統合インタプリタをロードしてから、これらの例を実行します。
 
 ```scheme
-;; Gaucheの場合
+;; Racketの場合
 (load "../step-09/interpreter.scm")
 
 ;; 例を実行
-(load "factorial.scm")
+(load "factorial-example.scm")
 ```
 
 ## 実用例
@@ -38,7 +38,7 @@
 これらのサンプルは、step-09の統合インタプリタで実行できます：
 
 ```scheme
-;; Gaucheの場合
+;; Racketの場合
 (load "../step-09/interpreter.scm")
 (load "factorial-example.scm")
 (interpret "(define factorial (lambda (n) (if (= n 0) 1 (* n (factorial (- n 1))))))")

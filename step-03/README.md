@@ -43,7 +43,7 @@
 実装が完了したら、実行してテストが通ることを確認してください。
 
 ```bash
-gosh step-03/evaluator-exercise.scm
+racket step-03/evaluator-exercise.scm
 ```
 
 ## step-01, step-02との統合例
