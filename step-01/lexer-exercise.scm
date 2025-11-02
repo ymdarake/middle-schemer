@@ -19,7 +19,11 @@
   ;; TODO: ここを実装してください
   ;; ヒント: loop を使って i を進めていきます
   ;; 空白文字なら i+1、そうでなければ i を返します
-  (error "skip-whitespace はまだ実装されていません"))
+  (let loop ((i start))
+    (if (and (< i (string-length str))
+             (whitespace? (string-ref str i)))
+        (loop (+ i 1))
+        i)))
 
 (define (read-number str start)
   "数値トークンを読み取る。数値の終端位置と値のペアを返す"
