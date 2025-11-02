@@ -1,3 +1,5 @@
+#lang racket
+
 ;; ステップ7: 再帰とループ構文
 ;; let, letrec を実装する
 

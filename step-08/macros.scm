@@ -1,3 +1,5 @@
+#lang racket
+
 ;; ステップ8: マクロとメタプログラミング
 ;; quote, quasiquote, unquote と define-syntax, syntax-rules を実装する
 

@@ -85,10 +85,22 @@ Hello, Scheme!
 
 Racketに標準で含まれる統合開発環境です。初心者にも使いやすく、対話的デバッグが可能です。
 
+**重要**: DrRacketでシンタックスハイライトを有効にするには、ファイルの先頭に `#lang racket` を記述してください。
+
 起動方法:
 ```bash
 drracket
 ```
+
+**ファイルの先頭に記述する例**:
+```scheme
+#lang racket
+
+;; これ以降がコード
+(display "Hello, Racket!\n")
+```
+
+すべての`.scm`ファイルには、すでに `#lang racket` が追加されています。
 
 ### Visual Studio Code
 

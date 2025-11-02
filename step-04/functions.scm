@@ -1,3 +1,5 @@
+#lang racket
+
 ;; ステップ4: 関数定義と適用
 ;; lambda と define を実装する
 
