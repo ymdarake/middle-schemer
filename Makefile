@@ -131,8 +131,9 @@ summary:
 		max_len=$$total_len; \
 	fi; \
 	width=$$((max_len + 2)); \
-	printf "%-$${width}s %8s %8s %8s %8s %10s\n" "ファイル" "成功" "失敗" "エラー" "合計" "成功率"; \
-	line_width=$$((width + 8 + 8 + 8 + 8 + 10)); \
+	printf "%-$${width}s" "ファイル"; \
+	printf "       %12s %12s %12s %12s %12s\n" "成功" "失敗" "エラー" "合計" "成功率"; \
+	line_width=$$((width + 12 + 12 + 12 + 12 + 12)); \
 	printf "%*s\n" $$line_width "" | tr " " "-"; \
 	for step in 01 02 03; do \
 		if [ -f $(TEST_RESULTS_DIR)/step-$$step-stats.txt ]; then \
@@ -151,7 +152,7 @@ summary:
 				02) name="step-02/parser-exercise.scm";; \
 				03) name="step-03/evaluator-exercise.scm";; \
 			esac; \
-			printf "%-$${width}s %8s %8s %8s %8s %9s%%\n" "$$name" "$$success" "$$failure" "$$error" "$$total" "$$percent"; \
+			printf "%-$${width}s %10s %10s %10s %10s %11s%%\n" "$$name" "$$success" "$$failure" "$$error" "$$total" "$$percent"; \
 		fi; \
 	done; \
 	printf "%*s\n" $$line_width "" | tr " " "-"; \
@@ -177,7 +178,7 @@ summary:
 	else \
 		total_percent="0.0"; \
 	fi; \
-	printf "%-$${width}s %8s %8s %8s %8s %9s%%\n" "合計" "$$total_success" "$$total_failure" "$$total_error" "$$total_tests" "$$total_percent"
+	printf "%-$${width}s %12s %10s %10s %10s %11s%%\n" "合計" "$$total_success" "$$total_failure" "$$total_error" "$$total_tests" "$$total_percent"
 
 # クリーンアップ（バックアップファイルとテスト結果を削除）
 clean:
