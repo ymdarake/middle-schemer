@@ -67,8 +67,8 @@
                          (end-pos (car id-result))
                          (id-value (cadr id-result)))
                     (tokenize-helper str end-pos
-                                    (cons id-value tokens)))))))))
-  
+                                    (cons id-value tokens))))))))))
+
   (tokenize-helper str 0 '()))
 
 ;; テスト用のヘルパー関数
