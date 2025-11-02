@@ -1,5 +1,7 @@
 #lang racket
 
+(require rackunit rackunit/text-ui)
+
 ;; ステップ1: レキサー（字句解析）
 ;; 文字列をトークンのリストに分割する
 
@@ -93,31 +95,64 @@
 
   (tokenize-helper str 0 '()))
 
-;; テスト用のヘルパー関数
-(define (test-lexer)
-  (display "=== レキサーのテスト ===\n")
-  
-  (let ((test-cases '(("(+ 1 2)" . ("(" "+" "1" "2" ")"))
-                      ("(define x 42)" . ("(" "define" "x" "42" ")"))
-                      ("(* (+ 1 2) 3)" . ("(" "*" "(" "+" "1" "2" ")" "3" ")"))
-                      ("(lambda (x) (+ x 1))" . ("(" "lambda" "(" "x" ")" "(" "+" "x" "1" ")" ")")))))
-    (for-each
-     (lambda (test-case)
-       (let* ((input (car test-case))
-              (expected (cdr test-case))
-              (result (tokenize input)))
-         (display "入力: ")
-         (display input)
-         (display "\n結果: ")
-         (display result)
-         (display "\n期待: ")
-         (display expected)
-         (display "\n")
-         (if (equal? result expected)
-             (display "✓ OK\n\n")
-             (display "✗ NG\n\n"))))
-     test-cases)))
+;; ============================================
+;; ユニットテスト（rackunit使用）
+;; ============================================
 
-;; 実行
-(test-lexer)
+;; whitespace?のテスト
+(define-test-suite whitespace-tests
+  (test-case "空白文字を判定"
+    (check-true (whitespace? #\space))
+    (check-true (whitespace? #\tab))
+    (check-true (whitespace? #\newline))
+    (check-false (whitespace? #\a))
+    (check-false (whitespace? #\1))))
+
+;; skip-whitespaceのテスト
+(define-test-suite skip-whitespace-tests
+  (test-case "空白文字をスキップ"
+    (check-equal? (skip-whitespace "  hello" 0) 2)
+    (check-equal? (skip-whitespace "hello" 0) 0)
+    (check-equal? (skip-whitespace "  " 0) 2)
+    (check-equal? (skip-whitespace "a  b" 1) 3)))
+
+;; read-numberのテスト
+(define-test-suite read-number-tests
+  (test-case "数値を読み取る"
+    (check-equal? (read-number "123abc" 0) '(3 123))
+    (check-equal? (read-number "42" 0) '(2 42))
+    (check-equal? (read-number "abc123" 3) '(6 123))))
+
+;; read-identifierのテスト
+(define-test-suite read-identifier-tests
+  (test-case "識別子を読み取る"
+    (check-equal? (read-identifier "hello world" 0) '(5 "hello"))
+    (check-equal? (read-identifier "+-*/" 0) '(4 "+-*/"))
+    (check-equal? (read-identifier "x123" 0) '(4 "x123"))))
+
+;; tokenizeのテスト
+(define-test-suite tokenize-tests
+  (test-case "文字列をトークンに分割"
+    (check-equal? (tokenize "(+ 1 2)") '("(" "+" "1" "2" ")"))
+    (check-equal? (tokenize "(define x 42)") '("(" "define" "x" "42" ")"))
+    (check-equal? (tokenize "(* (+ 1 2) 3)") '("(" "*" "(" "+" "1" "2" ")" "3" ")"))
+    (check-equal? (tokenize "(lambda (x) (+ x 1))") 
+                  '("(" "lambda" "(" "x" ")" "(" "+" "x" "1" ")" ")"))))
+
+;; すべてのテストスイート
+(define-test-suite lexer-tests
+  whitespace-tests
+  skip-whitespace-tests
+  read-number-tests
+  read-identifier-tests
+  tokenize-tests)
+
+;; テスト実行（メイン）
+(module+ main
+  (display "=== レキサーのユニットテスト ===\n\n")
+  (run-tests lexer-tests))
+
+;; テスト実行（モジュールとしてロードされた場合も実行）
+(module+ test
+  (run-tests lexer-tests))
 
