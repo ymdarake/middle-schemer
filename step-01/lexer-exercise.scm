@@ -71,26 +71,73 @@
 ;; ユニットテストスイート
 ;; ============================================
 
+
+;; テスト結果を蓄積するためのグローバル変数
+(define test-results '())
+
+;; ANSIカラーコード
+(define ansi-reset "\x1b[0m")
+(define ansi-green "\x1b[32m")
+(define ansi-red "\x1b[31m")
+
+;; テーブル風の表示用ヘルパー関数（色付け対応）
+(define (format-test-table results)
+  (let ((max-name-length 50))
+    ;; ヘッダーを表示
+    (display (format "+~a+----------+\n" (make-string max-name-length #\-)))
+    (display (format "| ~a~a | 結果     |\n" 
+                     "テスト名" 
+                     (make-string (- max-name-length 6) #\space)))
+    (display (format "+~a+----------+\n" (make-string max-name-length #\-)))
+    ;; 各テスト結果を表示
+    (for-each
+     (lambda (result)
+       (let* ((test-name (car result))
+              (status (cdr result))
+              (name-len (string-length test-name))
+              (padding (make-string (max 0 (- max-name-length name-len 3)) #\space))
+              ;; ステータスに応じて色を設定
+              (color-code (if (string=? status "SUCCESS") ansi-green ansi-red)))
+         (display (format "| ~a~a~a~a | ~a~a~a |\n" 
+                         color-code
+                         test-name 
+                         ansi-reset
+                         padding 
+                         color-code 
+                         status 
+                         ansi-reset))))
+     (reverse results))
+    ;; フッターを表示
+    (display (format "+~a+----------+\n" (make-string max-name-length #\-)))))
+
+;; 成功したテストケースも表示するカスタムtest-caseマクロ（テーブル風表示）
+(define-syntax-rule (test-case-verbose name body ...)
+  (test-case name
+    (with-handlers ([exn:fail? 
+                     (lambda (e)
+                       ;; 失敗時に結果を記録
+                       (set! test-results (cons (cons name "FAILURE") test-results))
+                       (raise e))])
+      (begin
+        body ...
+        ;; 成功時に結果を記録
+        (set! test-results (cons (cons name "SUCCESS") test-results))))))
+
 ;; テスト1: whitespace? 関数
 (define-test-suite test-whitespace?
   "whitespace?関数のテスト"
-  (test-case "空白文字を正しく判定"
+  (test-case-verbose "空白文字を正しく判定"
     ;; memberはリストまたは#fを返すので、リストが返れば真値として扱われる
     (check-not-false (whitespace? #\space))
     (check-not-false (whitespace? #\tab))
     (check-not-false (whitespace? #\newline))
     (check-false (whitespace? #\a))
-    (check-false (whitespace? #\1))
-    ;; 成功時に表示
-    (display (format "--------------------\n"))
-    (display (format "レキサーのすべてのテスト > test-whitespace? > 空白文字を正しく判定\n"))
-    (display (format "SUCCESS\n"))
-    (display (format "--------------------\n\n"))))
+    (check-false (whitespace? #\1))))
 
 ;; テスト2: skip-whitespace 関数
 (define-test-suite test-skip-whitespace
   "skip-whitespace関数のテスト"
-  (test-case "空白文字をスキップ"
+  (test-case-verbose "空白文字をスキップ"
     ;; TODO: 実装してからテストが通るようにしてください
     (with-handlers ([exn:fail? (lambda (e) 
                                   (fail-check "skip-whitespace はまだ実装されていません"))])
@@ -102,7 +149,7 @@
 ;; テスト3: read-number 関数
 (define-test-suite test-read-number
   "read-number関数のテスト"
-  (test-case "数値を正しく読み取る"
+  (test-case-verbose "数値を正しく読み取る"
     ;; TODO: 実装してからテストが通るようにしてください
     (with-handlers ([exn:fail? (lambda (e) 
                                   (fail-check "read-number はまだ実装されていません"))])
@@ -119,7 +166,7 @@
 ;; テスト4: read-identifier 関数
 (define-test-suite test-read-identifier
   "read-identifier関数のテスト"
-  (test-case "識別子を正しく読み取る"
+  (test-case-verbose "識別子を正しく読み取る"
     ;; TODO: 実装してからテストが通るようにしてください
     (with-handlers ([exn:fail? (lambda (e) 
                                   (fail-check "read-identifier はまだ実装されていません"))])
@@ -136,7 +183,7 @@
 ;; テスト5: tokenize 関数（統合テスト）
 (define-test-suite test-tokenize
   "tokenize関数のテスト"
-  (test-case "基本的なトークン分割"
+  (test-case-verbose "基本的なトークン分割"
     ;; TODO: 実装してからテストが通るようにしてください
     (with-handlers ([exn:fail? (lambda (e) 
                                   (fail-check "tokenize はまだ実装されていません"))])
@@ -159,20 +206,17 @@
    test-read-identifier
    test-tokenize))
 
-;; 成功したテストケースも表示するカスタムrun-tests
-;; 標準のrun-testsを実行し、成功したテストケースも表示
+;; 成功したテストケースも表示するカスタムrun-tests（テーブル風表示）
 (define (run-tests-with-success-display suite)
-  ;; 標準のrun-testsを実行（成功したテストケースは標準では表示されない）
-  ;; ただし、rackunitのデフォルト出力には成功情報が含まれていないため、
-  ;; 各テストケース内で成功時にメッセージを表示する必要がある
-  ;; しかし、既存のテストケースを修正するのは大変なので、
-  ;; 簡易版として、標準のrun-testsを使用し、
-  ;; テストスイートの構造を解析してテストケース名を表示
+  ;; テスト結果をリセット
+  (set! test-results '())
+  ;; 標準のrun-testsを実行（各テストケースがtest-resultsに結果を記録）
   (run-tests suite)
-  ;; 注：成功したテストケースの情報を取得する直接的な方法がないため、
-  ;; この実装では成功したテストケースの詳細な表示は省略
-  ;; 必要に応じて、各テストケース内で成功時にメッセージを表示する実装を検討
-  )
+  ;; すべてのテストが終了した後にテーブルを表示
+  (display "\n")
+  (display "=== テスト結果サマリー ===\n")
+  (format-test-table test-results)
+  (display "\n"))
 
 ;; テストを実行（コマンドライン引数で個別のテストを指定可能）
 (define (run-selected-tests)
