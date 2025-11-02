@@ -8,7 +8,29 @@
   (member c '(#\space #\tab #\newline #\return)))
 
 (define (skip-whitespace str start)
-  "空白文字をスキップして、次の非空白文字の位置を返す"
+  "空白文字をスキップして、次の非空白文字の位置を返す
+  
+  SICPの用語では：
+  - パターン1（現在の実装）: 末尾再帰による反復的プロセス（iterative process）
+    → 再帰的手続きで反復的プロセスを実現（SICPの「iterパターン」）
+  
+  参考実装（命令型スタイルの反復）:
+  (let ((i start))
+    (let loop ()
+      (if (and (< i (string-length str))
+               (whitespace? (string-ref str i)))
+          (begin
+            (set! i (+ i 1))  ; 副作用を使う（関数型スタイルではない）
+            (loop))
+          i)))
+  
+  参考実装（do構文）:
+  (do ((i start (+ i 1)))
+      ((or (>= i (string-length str))
+           (not (whitespace? (string-ref str i))))
+       i))
+  "
+  ;; パターン1: 末尾再帰（現在の実装）
   (let loop ((i start))
     (if (and (< i (string-length str))
              (whitespace? (string-ref str i)))
