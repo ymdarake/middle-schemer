@@ -1,5 +1,8 @@
 #lang racket
 
+(provide read-number
+         read-number-substring)
+
 (require rackunit rackunit/text-ui)
 
 ;; ステップ1: レキサー（字句解析） - 穴埋め式練習問題
@@ -32,19 +35,38 @@
   ;; 戻り値は (終端位置 数値) のリストです
   (let loop ((i start)
              (result '()))
-    (if #f  ; 未実装
-        '()
-        (error "read-number はまだ実装されていません"))))
+    (if (and (< i (string-length str))
+             (char-numeric? (string-ref str i)))
+        (loop (+ i 1)
+              (cons (string-ref str i) result))
+        (list i (string->number (list->string (reverse result)))))))
+
+;; 参考実装: substring方式（より効率的）
+;; 文字列の一部を一括で切り出してから数値化する
+(define (read-number-substring str start)
+  "数値の連続区間の終端を走査で求め、substringで一括切り出しして数値化する"
+  (let loop ((i start))
+    (if (and (< i (string-length str))
+             (char-numeric? (string-ref str i)))
+        (loop (+ i 1))
+        (list i (string->number (substring str start i))))))
 
 (define (read-identifier str start)
   "識別子トークンを読み取る。識別子の終端位置と値のペアを返す"
   (define (identifier-char? c)
     ;; TODO: ここを実装してください
     ;; 英字、数字、または記号（+, -, *, /, <, >, =, !, ?）なら真を返します
-    (error "identifier-char? はまだ実装されていません"))
-  
+    (or (char-alphabetic? c)
+        (char-numeric? c)
+        (member c '(#\+ #\- #\* #\/ #\< #\> #\= #\! #\?))))
   ;; TODO: read-number と同様に、ここを実装してください
-  (error "read-identifier はまだ実装されていません"))
+  (let loop ((i start)
+             (result '()))
+    (if (and (< i (string-length str))
+             (identifier-char? (string-ref str i)))
+        (loop (+ i 1)
+              (cons (string-ref str i) result))
+        (list i (list->string (reverse result))))))
 
 (define (tokenize str)
   "文字列をトークンのリストに分割する"

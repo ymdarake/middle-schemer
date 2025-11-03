@@ -1,13 +1,14 @@
 # Middle Schemer - Makefile for Testing
 # 
 # 使い方:
-#   make test            # すべてのテストを実行
-#   make test-step-01    # step-01のテストを実行
-#   make test-step-02    # step-02のテストを実行
-#   make test-step-03    # step-03のテストを実行
-#   make help            # ヘルプを表示
+#   make test                 # すべてのテストを実行
+#   make test-step-01         # step-01のテストを実行
+#   make test-step-02         # step-02のテストを実行
+#   make test-step-03         # step-03のテストを実行
+#   make bench-read-number    # read-number系のベンチを実行
+#   make help                 # ヘルプを表示
 
-.PHONY: test test-all test-step-01 test-step-02 test-step-03 help clean summary
+.PHONY: test test-all test-step-01 test-step-02 test-step-03 help clean summary bench-read-number
 
 # Racketコマンドの確認
 RACKET := racket
@@ -17,6 +18,9 @@ RACKET_VERSION := $(shell $(RACKET) --version 2>/dev/null | head -1 || echo "")
 STEP_01_EXERCISE := step-01/lexer-exercise.scm
 STEP_02_EXERCISE := step-02/parser-exercise.scm
 STEP_03_EXERCISE := step-03/evaluator-exercise.scm
+
+# ベンチマーク用ファイル
+STEP_01_BENCH_READ_NUMBER := step-01/bench-read-number.scm
 
 # デフォルトターゲット
 .DEFAULT_GOAL := help
@@ -94,11 +98,12 @@ help:
 	@echo "Middle Schemer - テスト用Makefile"
 	@echo ""
 	@echo "利用可能なコマンド:"
-	@echo "  make test            - すべてのテストを実行"
-	@echo "  make test-all        - すべてのテストを実行（testと同じ）"
-	@echo "  make test-step-01    - step-01のレキサーテストを実行"
-	@echo "  make test-step-02    - step-02のパーサーテストを実行"
-	@echo "  make test-step-03    - step-03の評価器テストを実行"
+	@echo "  make test                 - すべてのテストを実行"
+	@echo "  make test-all             - すべてのテストを実行（testと同じ）"
+	@echo "  make test-step-01         - step-01のレキサーテストを実行"
+	@echo "  make test-step-02         - step-02のパーサーテストを実行"
+	@echo "  make test-step-03         - step-03の評価器テストを実行"
+	@echo "  make bench-read-number    - read-number系のベンチを実行"
 	@echo "  make check-racket    - Racketのインストールを確認"
 	@echo "  make help            - このヘルプメッセージを表示"
 	@echo ""
@@ -107,6 +112,22 @@ help:
 	@echo "  racket step-02/parser-exercise.scm string->symbol-safe"
 	@echo "  racket step-03/evaluator-exercise.scm eval-expr-number"
 	@echo ""
+	@echo "ベンチ実行例:"
+	@echo "  make bench-read-number"
+	@echo "  racket step-01/bench-read-number.scm"
+
+# ベンチ: read-number vs read-number-substring
+bench-read-number:
+	@echo ""
+	@echo "=========================================="
+	@echo "step-01: read-number ベンチマーク"
+	@echo "=========================================="
+	@if [ -f $(STEP_01_BENCH_READ_NUMBER) ]; then \
+		$(RACKET) $(STEP_01_BENCH_READ_NUMBER); \
+	else \
+		echo "エラー: $(STEP_01_BENCH_READ_NUMBER) が見つかりません"; \
+		exit 1; \
+	fi
 
 # テスト結果のサマリを表示
 summary:
