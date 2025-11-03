@@ -33,7 +33,7 @@
        i))
   "
   ;; パターン1: 末尾再帰（現在の実装）
-  (let loop ((i start))
+  (let loop ([i start])
     (if (and (< i (string-length str))
              (whitespace? (string-ref str i)))
         (loop (+ i 1))
@@ -41,8 +41,8 @@
 
 (define (read-number str start)
   "数値トークンを読み取る。数値の終端位置と値のペアを返す"
-  (let loop ((i start)
-             (result '()))
+  (let loop ([i start]
+             [result '()])
     (if (and (< i (string-length str))
              (char-numeric? (string-ref str i)))
         (loop (+ i 1)
@@ -56,8 +56,8 @@
         (char-numeric? c)
         (member c '(#\+ #\- #\* #\/ #\< #\> #\= #\! #\?))))
   
-  (let loop ((i start)
-             (result '()))
+  (let loop ([i start]
+             [result '()])
     (if (and (< i (string-length str))
              (identifier-char? (string-ref str i)))
         (loop (+ i 1)
@@ -69,29 +69,29 @@
   (define (tokenize-helper str start tokens)
     (if (>= start (string-length str))
         (reverse tokens)
-        (let ((pos (skip-whitespace str start)))
+        (let* ([pos (skip-whitespace str start)])
           (if (>= pos (string-length str))
               (reverse tokens)
-              (let ((c (string-ref str pos)))
+              (let* ([c (string-ref str pos)])
                 (cond
-                 ((char=? c #\()
-                  (tokenize-helper str (+ pos 1)
-                                  (cons "(" tokens)))
-                 ((char=? c #\))
-                  (tokenize-helper str (+ pos 1)
-                                  (cons ")" tokens)))
-                 ((char-numeric? c)
-                  (let* ((num-result (read-number str pos))
-                         (end-pos (car num-result))
-                         (num-value (cadr num-result)))
-                    (tokenize-helper str end-pos
-                                    (cons (number->string num-value) tokens))))
-                 (else
-                  (let* ((id-result (read-identifier str pos))
-                         (end-pos (car id-result))
-                         (id-value (cadr id-result)))
-                    (tokenize-helper str end-pos
-                                    (cons id-value tokens))))))))))
+                  [(char=? c #\()
+                   (tokenize-helper str (+ pos 1)
+                                   (cons "(" tokens))]
+                  [(char=? c #\))
+                   (tokenize-helper str (+ pos 1)
+                                   (cons ")" tokens))]
+                  [(char-numeric? c)
+                   (let* ([num-result (read-number str pos)]
+                          [end-pos (car num-result)]
+                          [num-value (cadr num-result)])
+                     (tokenize-helper str end-pos
+                                      (cons (number->string num-value) tokens)))]
+                  [else
+                   (let* ([id-result (read-identifier str pos)]
+                          [end-pos (car id-result)]
+                          [id-value (cadr id-result)])
+                     (tokenize-helper str end-pos
+                                      (cons id-value tokens)))]))))))
 
   (tokenize-helper str 0 '()))
 
