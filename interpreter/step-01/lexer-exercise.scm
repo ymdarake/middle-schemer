@@ -54,10 +54,10 @@
                 (cond
                  ;; TODO: 開き括弧の場合の処理を実装してください
                  ((char=? c #\()
-                  (error "開き括弧の処理はまだ実装されていません"))
+                  (tokenize-helper str (+ pos 1) (cons "(" tokens)))
                  ;; TODO: 閉じ括弧の場合の処理を実装してください
                  ((char=? c #\))
-                  (error "閉じ括弧の処理はまだ実装されていません"))
+                  (tokenize-helper str (+ pos 1) (cons ")" tokens)))
                  ;; TODO: 数字の場合の処理を実装してください
                  ((char-numeric? c)
                   (error "数字の処理はまだ実装されていません"))
