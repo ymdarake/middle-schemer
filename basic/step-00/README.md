@@ -1,22 +1,23 @@
 ## step-00: rackunit と実行環境の確認
 
-このステップでは、Racketの最小実行とテストフレームワーク rackunit の使い方を体験します。
+Racketで“テストを書いて回す”最小サイクルを体験します。
 
-### 学ぶこと
-- **モジュールの基本**: `#lang racket`、`(module+ main ...)` のエントリポイント
-- **関数定義**: `define`
-- **テスト**: `rackunit` の `test-suite` / `test-case` / `check-equal?` / `check-exn`
+### 1. 基本の3点
+- 先頭に `#lang racket`（モジュールの宣言）
+- 関数定義は `define`
+- テストは `rackunit`（`test-suite` / `test-case` / `check-*`）
 
-### 試してみよう
-- `square` のテストが通ることを確認
-- `unimplemented` は例外になる（`TODO` を実装してテストを書き換えてもOK）
-- 実行コマンド: `make -C basic test-step-00`
+### 2. 動かしてみる
+- `make -C basic test-step-00` を実行
+- `square` が通り、`unimplemented` が例外になることを確認
+- `module+ main` で“実行時の入口”を用意しておくと便利
 
-### 公式ドキュメント
-- Racket Guide: [Modules](https://docs.racket-lang.org/guide/modules.html)
-- rackunit: [rackunit Manual](https://docs.racket-lang.org/rackunit/)
-- Racket Reference: [Definitions](https://docs.racket-lang.org/reference/define.html)
+### 3. 次へ進むために
+- 以降の各ステップでも `make test-step-XX` で即時フィードバック
+- 失敗→修正→再実行のテンポに慣れよう
 
-### ヒント
-- `rackunit/text-ui` を `require` すると `run-tests` でテストを実行できます。
-- エントリポイントは `(module+ main ...)` を使うとテストと同居させやすいです。
+### 参考リンク
+- Scheme Standards（歴史と標準の俯瞰）: [standards.scheme.org](https://standards.scheme.org/)
+- TSPL: [Chapter 2 Getting Started](https://www.scheme.com/tspl4/start.html), [Section 1.1 Scheme Syntax](https://www.scheme.com/tspl4/intro.html#./intro:h1)
+- rackunit: rackunit Manual（Racket公式）
+- Racket Guide: Modules / Testing

@@ -1,20 +1,23 @@
 ## step-02: リストユーティリティと再帰
 
-このステップでは、リストを処理する基本的な関数を自作し、再帰・名前付きlet・高階関数の下地を作ります。
+リスト処理を通して、自然再帰→末尾再帰→名前付き`let`の流れを体験します。
 
-### 学ぶこと
-- **基本関数の自作**: `length` / `append` / `map` / `filter` / `foldl`
-- **再帰の型**: 自然再帰・末尾再帰、蓄積変数の導入
-- **名前付き let**: 反復処理を関数化せず手早く書く
+### 1. length / append
+- `length`: 末尾に着くまで `n` を増やす（自然再帰でもOK）
+- `append`: 先頭から `cons` で積み直しながら `ys` を最後に繋ぐ
+
+### 2. map / filter
+- `map f`: 各要素に `f` を適用して新リストを作る
+- `filter p`: `p` が真の要素だけを残す（`acc` に貯めて最後に `reverse`）
+
+### 3. foldl
+- 左畳み込み: `(foldl f init '(a b c))` は `f(f(f init a) b) c)`
+- 多くの関数は fold で記述できる（発想の核）
 
 ### 実行
 - `make -C basic test-step-02`
 
-### 公式ドキュメント
-- Racket Guide: [Iteration and Recursion](https://docs.racket-lang.org/guide/loops.html)
-- Racket Guide: [Pairs and Lists](https://docs.racket-lang.org/guide/pairs.html)
-- Racket Reference: [for/fold などの反復](https://docs.racket-lang.org/reference/for.html)
-
-### ヒント
-- `my-append` は `xs` を前からたどって `cons` で積み上げるのが基本です。
-- `my-foldl` は畳み込み。`foldl` でほかの関数を表現できると理解が深まります。
+### 参考リンク
+- Scheme Standards: 反復とリストの基本（各版共通） [standards.scheme.org](https://standards.scheme.org/)
+- TSPL: [5.4 Recursion and Iteration](https://www.scheme.com/tspl4/control.html#./control:h5), [5.5 Mapping and Folding](https://www.scheme.com/tspl4/control.html#./control:h6)
+- Racket Guide: Loops / Pairs and Lists

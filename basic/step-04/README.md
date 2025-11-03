@@ -1,21 +1,29 @@
 ## step-04: 関数と高階関数の基本
 
-このステップでは、関数を組み合わせる基本テクニックを学びます。
+“関数を材料に、関数を作る”練習です。小さな関数を組み合わせて表現力を上げましょう。
 
-### 学ぶこと
-- **compose**: `(compose f g)` は `x` に対し `f(g(x))`
-- **partial**: 先頭引数を一部だけ束縛して新しい関数を作る
-- **curry2**: 2引数関数を段階適用できる形に変換
-- **flip**: 2引数関数の引数順を入れ替える
-- **apply-n**: 関数を `n` 回合成した関数を作る
+### 1. compose で合成
+- `(compose f g)` は `x` に対して `f(g(x))`
+- まずは1引数関数で感覚を掴む
 
-### 実行
-- `make -C basic test-step-04`
+### 2. 部分適用 partial
+- `partial` は先頭の引数を固定して新しい関数を返す
+- 例: `(partial + 3)` は「3を足す関数」に
+- Racketのキーワード引数もそのまま `apply` で渡せる
 
-### 公式ドキュメント
-- Racket Guide: [Procedures](https://docs.racket-lang.org/guide/procedures.html)
-- Racket Reference: [Procedure Application](https://docs.racket-lang.org/reference/procedures.html)
+### 3. curry2 / flip
+- `curry2`: 2引数関数を段階適用 `((curry2 f) a) b`
+- `flip`: 2引数の順序を入れ替え `((flip -) 10 3) => -7`
 
-### ヒント
-- 可変長引数を扱うときは `define (f . args)` の形が便利です。
-- 合成は左結合・右結合のどちらで期待しているかをテストで先に決めると迷いません。
+### 4. apply-n
+- `f` を `n` 回合成した関数を作る
+- `n=0` は恒等関数（そのまま返す）にするのがきれい
+
+### 5. 練習と動かし方
+- `exercise.scm` を実装し、`make -C basic test-step-04` で即時フィードバック
+- 合成の左右どちらの結合か、テストで先に期待を固定すると迷いません
+
+### 参考リンク
+- Scheme Standards（関数適用の基本は各版で共通）: [standards.scheme.org](https://standards.scheme.org/)
+- TSPL: [Chapter 5 → 5.5 Mapping and Folding](https://www.scheme.com/tspl4/control.html#./control:h6)
+- Racket Guide: Procedures（手続き/適用/可変長引数）

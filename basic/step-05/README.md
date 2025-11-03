@@ -1,20 +1,35 @@
 ## step-05: クォートと準クォート（'  `  ,  ,@）
 
-このステップでは、S式をデータとして扱い、テンプレート的に式を生成する方法を学びます。
+S式（リスト）を“データとして扱う”基礎を身につけます。これはマクロ（次ステップ）への登竜門です。
 
-### 学ぶこと
-- **クォート**: `'(a b c)` はシンボル列をそのままデータとして扱う
-- **準クォート**: `` `(a ,x ,@xs) `` のように、テンプレート内で一部を評価
-  - `,` は1つの値を埋め込み、`,@` はリストを展開（スプライス）
-- **テンプレート構築**: 呼び出し式や `let` などのS式を組み立てる
+### 1. クォート `'`
+- `'(a b c)` は、評価せずそのままの“データ”を指します
+- `'(+)` は「+を先頭要素にもつリスト」という“データ”であり、計算ではありません
 
-### 実行
-- `make -C basic test-step-05`
+手を動かす
+- `'(1 2 3)` と `(list 1 2 3)` の結果を比べる
+- `quote-list` を実装して、リストを“作る”感覚を掴む
 
-### 公式ドキュメント
-- Racket Guide: [Quotation](https://docs.racket-lang.org/guide/quote.html)
-- Racket Reference: [Quote and Quasiquote](https://docs.racket-lang.org/reference/quote.html)
+### 2. 準クォート `` ` `` と `,` / `,@`
+- `` `(a ,x ,@xs) `` で、テンプレートの一部を評価して埋め込めます
+  - `,x` は1つの値を差し込む
+  - `,@xs` はリストを“展開（スプライス）”する
 
-### ヒント
-- シンボルを式の先頭に置けば「関数/演算子呼び出し」を表現できます（例: `'(+ 1 2)`）。
-- `,@` はリスト以外に使うとエラー。データ形の前提をテストで固定しましょう。
+手を動かす
+- `make-call`: `(make-call '+ '(1 2 3))` ⇒ `'(+ 1 2 3)` を生成
+- `let-binding`: ``(let ((,name ,expr)) ,body)`` の形をテンプレートで作る
+- `alist->hash-expr`: `((a 1) (b 2))` から `(hash 'a 1 'b 2)` を作る（`,@` の練習）
+
+コツ
+- 「いま作っているのは“式”のリスト」= 「コードを表すデータ」
+- 生成結果が有効なRacketの式になっているか、常に目で確認
+
+### 3. なぜ学ぶの？（マクロの準備）
+- 準クォートは“コードの型”をテンプレートで表現する力を与えます
+- 次ステップのマクロで、このテンプレートに“展開ロジック”を与えます
+
+### 参考リンク
+- Scheme Standards（R5RS/R6RS/R7RS 概観）: [standards.scheme.org](https://standards.scheme.org/)
+  - R5RS: Quotation（`syntax-rules` の基盤となる考え）
+- TSPL: [6.1 Constants and Quotation](https://www.scheme.com/tspl4/objects.html#./objects:h1)
+- Racket Guide: Quasiquote/Quote（Racketのテンプレート作法）
