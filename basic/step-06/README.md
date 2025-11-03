@@ -2,6 +2,13 @@
 
 このステップでは、式（コード）をデータとして扱い、テンプレートで「別のコード」に展開する“マクロ”を学びます。まずは安全に使えるテンプレート指向の書き方から始め、必要に応じて柔軟な書き方へ段階的に進みます。
 
+### このステップで書くもの（ゴール）
+- `sum` マクロ: 可変長の数を受け取り、`(+ ...)` に展開（引数なしは `0`）
+- `when-let` マクロ: 一時変数の束縛と条件付き実行を一つの構文にまとめる
+- `->` マクロ: 値を左から右へ関数に通す“スレッディング”（可読性を上げる糖衣）
+
+それぞれ「どんな不便を解消するための構文か」を意識して設計します。
+
 ### 0. まず前提を知る（超要約）
 - マクロは「コンパイル前にコードを変形する仕組み」。実行時ではなく展開時に働く
 - Scheme/Racketのマクロは“衛生的（hygienic）”で、変数の取り違いが起きにくい
@@ -47,6 +54,43 @@
 ### 5. 実行方法
 - 課題（exercise）を編集してテスト: `make -C basic test-step-06`
 - 正解（solution）を参考に差分で学ぶ
+
+### when-let が役に立つ場面
+- 失敗するかもしれない“変換”にガードを付けたい（例: 文字列→数値）
+- オプショナルな値（ハッシュ/辞書検索、環境変数など）を安全に使いたい
+- 正規表現マッチの結果（`#f` かマッチ配列）をパターン化したい
+
+### サンプルと結果
+```racket
+; sum
+(sum)        ; => 0
+(sum 1 2 3)  ; => 6
+
+; when-let: 文字列→数値の安全変換
+(when-let (n (string->number "42"))
+  (+ n 1))  ; => 43
+(when-let (n (string->number "oops"))
+  (+ n 1))  ; => (void)
+
+; when-let: ハッシュからのオプショナル取得
+(define env (hash 'token "abc"))
+(when-let (t (hash-ref env 'token #f))
+  (string-length t)) ; => 3
+(when-let (t (hash-ref env 'missing #f))
+  (string-length t)) ; => (void)
+
+; when-let: 正規表現マッチの活用（cadrで第1キャプチャを取り出す）
+(when-let (m (regexp-match #rx"^user:(.+)$" "user:alice"))
+  (cadr m)) ; => "alice"
+(when-let (m (regexp-match #rx"^user:(.+)$" "guest"))
+  (cadr m)) ; => (void)
+
+; -> threading
+(define (f x a) (+ x a))
+(define (g x b) (* x b))
+(-> 1 (f 2) (g 3)) ; => 9
+(-> "a" (string-append "b") (string-append "c")) ; => "abc"
+```
 
 ### 参考リンク
 - Scheme Standards（R5RS/R6RS/R7RS まとめ）: [standards.scheme.org](https://standards.scheme.org/)

@@ -2,6 +2,11 @@
 
 文字列の分解・結合・探索を“小さな関数”に切り出す練習です。
 
+### このステップで書くもの（ゴール）
+- 文字列操作の最小ユーティリティ群:
+  - `take-str` / `drop-str` / `find-char` / `join-with`
+- テストで境界条件（空/短い/見つからない）を明確化
+
 ### 1. 分解（take/drop）
 - `take-str s n`: 先頭から `n` 文字（範囲外は切り詰め）
 - `drop-str s n`: 先頭から `n` 文字を捨てた残り
@@ -17,6 +22,15 @@
 
 ### 実行
 - `make -C basic test-step-03` で即時フィードバック
+
+### サンプルと結果
+```racket
+(take-str "hello" 2) ; => "he"
+(drop-str "hello" 2) ; => "llo"
+(find-char "hello" #\l) ; => 2
+(find-char "hello" #\z) ; => #f
+(join-with "," '("a" "b" "c")) ; => "a,b,c"
+```
 
 ### 参考リンク
 - Scheme Standards（文字列は各版で基本的に共通）: [standards.scheme.org](https://standards.scheme.org/)
