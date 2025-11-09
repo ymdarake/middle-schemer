@@ -21,7 +21,7 @@ test: test-all
 test-all: test-step-00 test-step-01 test-step-02 test-step-03 test-step-04 test-step-05 test-step-06
 
 test-step-00:
-	@echo "\n=== basic/step-00 ===" && $(RACKET) step-00/exercise.scm
+	@echo "\n=== basic/step-00 ===" && $(RACKET) step-00/env-setup-check.scm
 
 test-step-01:
 	@echo "\n=== basic/step-01 ===" && $(RACKET) step-01/exercise.scm
