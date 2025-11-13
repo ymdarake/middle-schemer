@@ -7,8 +7,31 @@
 (define (compose f g)
   (λ (x) (f (g x))))
 
-(define (partial f . bound)
-  (λ args (apply f (append bound args))))
+(define partial
+  (make-keyword-procedure
+   (lambda (kws kw-vals f . bound)
+     (make-keyword-procedure
+      (lambda (extra-kws extra-kw-vals . extra-args)
+        (let ((all-kws (append kws extra-kws))
+              (all-kw-vals (append kw-vals extra-kw-vals))
+              (all-args (append bound extra-args)))
+          (if (null? all-kws)
+              (apply f all-args)
+              (keyword-apply f all-kws all-kw-vals all-args))))
+      (lambda extra-args
+        (let ((all-args (append bound extra-args)))
+          (if (null? kws)
+              (apply f all-args)
+              (keyword-apply f kws kw-vals all-args))))))
+   (lambda (f . bound)
+     (make-keyword-procedure
+      (lambda (extra-kws extra-kw-vals . extra-args)
+        (let ((all-args (append bound extra-args)))
+          (if (null? extra-kws)
+              (apply f all-args)
+              (keyword-apply f extra-kws extra-kw-vals all-args))))
+      (lambda extra-args
+        (apply f (append bound extra-args)))))))
 
 (define (curry2 f)
   (λ (a) (λ (b) (f a b))))
@@ -36,8 +59,11 @@
    (test-case "partial"
      (define add3 (partial + 3))
      (check-equal? (add3 7) 10)
-     (define join-dash (partial string-join #:separator "-"))
+     (define (my-string-join lst #:separator sep)
+       (string-join lst sep))
+     (define join-dash (partial my-string-join #:separator "-"))
      (check-equal? (join-dash '("a" "b" "c")) "a-b-c"))
+
 
    (test-case "curry2"
      (define curried+ (curry2 +))
