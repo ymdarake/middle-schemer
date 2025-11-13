@@ -7,6 +7,11 @@
 (define (compose f g)
   (λ (x) (f (g x))))
 
+;; キーワード引数非対応の簡易版
+(define (partial-simple f . bound)
+  (λ args (apply f (append bound args))))
+
+;; キーワード引数対応版
 (define partial
   (make-keyword-procedure
    (lambda (kws kw-vals f . bound)
@@ -63,6 +68,14 @@
        (string-join lst sep))
      (define join-dash (partial my-string-join #:separator "-"))
      (check-equal? (join-dash '("a" "b" "c")) "a-b-c"))
+
+   (test-case "partial-simple"
+     (define add3 (partial-simple + 3))
+     (check-equal? (add3 7) 10)
+     (define multiply-by-2 (partial-simple * 2))
+     (check-equal? (multiply-by-2 5) 10)
+     (define add-multiple (partial-simple + 1 2 3))
+     (check-equal? (add-multiple 4) 10))
 
 
    (test-case "curry2"
